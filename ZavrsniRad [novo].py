@@ -87,7 +87,7 @@ l2=0.75
 Y1=lambda t,y:0*t+(-9.81*(2*m1+m2)*np.sin(y[0][0])-m2*9.81*np.sin(y[0][0]-2*y[1][0])-2*np.sin(y[0][0]-y[1][0])*m2*((y[1][1])**2*l2+(y[0][1])**2*l1*np.cos(y[0][0]-y[1][0])))/(l1*(2*m1+m2-m2*np.cos(2*y[0][0]-2*y[0][1])))
 Y2=lambda t,y:0*t+(2*np.sin(y[0][0]-y[1][0])*((y[0][1])**2*l1*(m1+m2)+9.81*(m1+m2)*np.cos(y[0][0])+(y[1][1])**2*l2*m2*np.cos(y[0][0]-y[1][0])))/(l2*(2*m1+m2-m2*np.cos(2*y[0][0]-2*y[1][0])))
 
-t1,y1,y2=Runge_Kutta4(0,10,10000,Y1,Y2,[[deg(45),2*np.pi/180],[deg(30),4*np.pi/180]]) #0,1000,10000,15,2,30,4
+t1,y1,y2=Runge_Kutta4(0,10,10000,Y1,Y2,[[deg(30),2],[deg(45),-1]]) #0,1000,10000,15,2,30,4
 #0,10,1000,15,2,30,4
 #0,10,1000,45,2,30,4
 
@@ -148,25 +148,42 @@ plt.title('y-x graf')
 plt.legend()
 plt.show()
 
+trajanje_animacije = t1[-1] - t1[0]
+frame_rate = 60
+broj_frameova = int(trajanje_animacije * frame_rate)
 
-def animate(i):
-    ln1.set_data([0,X1[i],X2[i]],[0,Y1[i],Y2[i]])
-    ln2.set_data([X1[i]],[Y1[i]])
-    ln3.set_data([X2[i]],[Y2[i]])
-    ln4.set_data([0,X1[i],X2[i]],[0,Y1[i],Y2[i]])
-    lab = 'Time:'+str(round(0.01+0.01*i,1))
-    L.get_texts()[0].set_text(lab)
+indeksi = np.linspace(0, len(t1) - 1, broj_frameova, dtype=int)
+t_anim = [t1[i] for i in indeksi]
+X1_anim = [X1[i] for i in indeksi]
+Y1_anim = [Y1[i] for i in indeksi]
+X2_anim = [X2[i] for i in indeksi]
+Y2_anim = [Y2[i] for i in indeksi]
 
-fig, ax = plt.subplots(1,1, figsize=(6,6))
+fig, ax = plt.subplots(1, 1, figsize=(6,6))
 ax.set_facecolor("w")
 ax.get_xaxis().set_ticks([])
 ax.get_yaxis().set_ticks([])
-ln4, =plt.plot([],[], 'k-', lw=1.5,label='Time: 0')
-ln1, =plt.plot(0,0,'b')
-ln2, =plt.plot([],[], 'ro-', lw=2, markersize=9,label='Prvo njihalo')
-ln3, =plt.plot([],[], 'bo-', lw=2, markersize=9,label='Drugo njihalo')
-L=plt.legend(loc=1)
-ax.set_ylim(-4,1)
-ax.set_xlim(-2.5,2.5)
-ani = animation.FuncAnimation(fig, animate, frames=1000, interval=0.01, repeat=False)
+ax.grid(True, which='both', linestyle='--', linewidth=0.5, color='gray')
+ax.set_title("Simulacija vezanih njihala")
+
+ln4, = ax.plot([], [], 'k-', lw=1.5, label='Time: 0')
+ln1, = ax.plot([], [], 'b')
+ln2, = ax.plot([], [], 'ro-', lw=2, markersize=9, label='Prvo njihalo')
+ln3, = ax.plot([], [], 'bo-', lw=2, markersize=9, label='Drugo njihalo')
+L = ax.legend(loc=1)
+
+ax.set_ylim(-4, 1)
+ax.set_xlim(-2.5, 2.5)
+
+def animate(i):
+    ln1.set_data([0, X1_anim[i], X2_anim[i]], [0, Y1_anim[i], Y2_anim[i]])
+    ln2.set_data([X1_anim[i]], [Y1_anim[i]])
+    ln3.set_data([X2_anim[i]], [Y2_anim[i]])
+    ln4.set_data([0, X1_anim[i], X2_anim[i]], [0, Y1_anim[i], Y2_anim[i]])
+    lab = f'Time: {t_anim[i]:.2f} s'
+    L.get_texts()[0].set_text(lab)
+    return ln1, ln2, ln3, ln4, L
+
+ani = animation.FuncAnimation(fig, animate,frames=broj_frameova,interval=1000 / frame_rate,blit=False,repeat=False)
+
 plt.show()
