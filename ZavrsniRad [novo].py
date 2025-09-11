@@ -9,6 +9,8 @@ from matplotlib.animation import FuncAnimation
 def deg(kut):
     return kut/180*np.pi
 
+#Rješavanje sustava N diferencijalnih jednadžbi N-tog reda
+
 def Runge_Kutta4(a,b,N,dif_jed1,dif_jed2,poc_uvjeti):
     '''dif_jedn: yN=f(t,[y0,...,yN-1])\npoc_uvjeti: [y0(t0),...,yN-1(t0)]'''
     h=(b-a)/N
@@ -43,8 +45,6 @@ def Runge_Kutta4(a,b,N,dif_jed1,dif_jed2,poc_uvjeti):
         argument_pomocni=[[],argument[1]]
         for i in range(red):
             delta[i]+=h/6*lista_der[i]
-        #print(type(t+h),type(float(argument[0][0])))
-
 
         t=a+j*h
         delta2=[0]*red
@@ -79,22 +79,18 @@ def Runge_Kutta4(a,b,N,dif_jed1,dif_jed2,poc_uvjeti):
     return lista_t,lista_y,lista_y2
 
 
-m1=0.2
-m2=0.1
-l1=1.25
-l2=0.75
+m1=0.2 #kg
+m2=0.1 #kg
+l1=1.25 #m
+l2=0.75 #m
 
 Y1=lambda t,y:0*t+(-9.81*(2*m1+m2)*np.sin(y[0][0])-m2*9.81*np.sin(y[0][0]-2*y[1][0])-2*np.sin(y[0][0]-y[1][0])*m2*((y[1][1])**2*l2+(y[0][1])**2*l1*np.cos(y[0][0]-y[1][0])))/(l1*(2*m1+m2-m2*np.cos(2*y[0][0]-2*y[0][1])))
 Y2=lambda t,y:0*t+(2*np.sin(y[0][0]-y[1][0])*((y[0][1])**2*l1*(m1+m2)+9.81*(m1+m2)*np.cos(y[0][0])+(y[1][1])**2*l2*m2*np.cos(y[0][0]-y[1][0])))/(l2*(2*m1+m2-m2*np.cos(2*y[0][0]-2*y[1][0])))
 
-t1,y1,y2=Runge_Kutta4(0,10,10000,Y1,Y2,[[deg(30),2],[deg(45),-1]]) #0,1000,10000,15,2,30,4
-#0,10,1000,15,2,30,4
-#0,10,1000,45,2,30,4
+t1,y1,y2=Runge_Kutta4(0,15,10000,Y1,Y2,[[deg(15),-2],[deg(30),4]]) #Potrebno unijeti: t1,t2, broj koraka N, prva dif. jed., druga dif. jed., poc. uvjeti za oba njihala
 
-#Sustav s u i v varijablama
+#Grafovi
 
-#print(t1[0],y1[0])
-#print(type(t1[0]),type(y1[0]))
 plt.plot(t1,y1,'r',label='Prvo njihalo')
 plt.plot(t1,y2,'b',label='Drugo njihalo')
 plt.xlabel('t[s]')
@@ -148,6 +144,8 @@ plt.title('y-x graf')
 plt.legend()
 plt.show()
 
+#Animacija dvostrukog njihala
+
 trajanje_animacije = t1[-1] - t1[0]
 frame_rate = 60
 broj_frameova = int(trajanje_animacije * frame_rate)
@@ -167,7 +165,7 @@ ax.grid(True, which='both', linestyle='--', linewidth=0.5, color='gray')
 ax.set_title("Simulacija vezanih njihala")
 
 ln4, = ax.plot([], [], 'k-', lw=1.5, label='Time: 0')
-ln1, = ax.plot([], [], 'b')
+ln1, = ax.plot([], [], 'k')
 ln2, = ax.plot([], [], 'ro-', lw=2, markersize=9, label='Prvo njihalo')
 ln3, = ax.plot([], [], 'bo-', lw=2, markersize=9, label='Drugo njihalo')
 L = ax.legend(loc=1)
